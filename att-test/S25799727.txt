@@ -1,0 +1,1 @@
+::1 16/August/2025 08:30:39 Mozilla/5.0_(Macintosh;_Intel_Mac_OS_X_10_15_7)_AppleWebKit/537.36_(KHTML,_like_Gecko)_Chrome/138.0.0.0_Safari/537.36 S25799727 webfile/practice/1pipe.txt 8 p(0,2)p(1,2);p(2,2);p(3,2);p(4,2);p(5,2);p(6,2);p(7,2);p(7,3); 2376;613;717;600;650;784;601;635;
