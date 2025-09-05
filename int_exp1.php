@@ -104,7 +104,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
    You cannot see through the walls. The squares you cannot see yet are black.<br><br>
    <mark> The exit is equally likely to be behind any of the black squares.</mark> <br><br> 
    A maze looks like this: <br><br>
-   <img src='webfile/exampleplanning.png' width='500' height='270' > 
+   <img src='webfile/exampleplanning.png' width='800' height='220' > 
    
    <br><b> <font size="+4">💰</font> YOU COULD GET A BONUS! <font size="+4">💰</font> </b><br><br>
    <mark>Planning your path wisely will pay off.</mark> <br><br> 

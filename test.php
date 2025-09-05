@@ -429,7 +429,7 @@ var firsttrial = "<?php global $firsttrial; echo $firsttrial; ?>";
 jssteps = <?php global $steps; echo $steps;?>;
 var progress_step = 1;
 var quizcorrect = "<?php global $quizcorrect; echo $quizcorrect; ?>";
-var maxsteps = 500;
+// var maxsteps = 500;
 var oldtime = new Date();
 var fitPasses = 0;
 
@@ -549,119 +549,63 @@ function checkline(x1, y1, px, py, step) {
 
 
 function generate_table(wagent) {
-    // generate progress
-     var bigtable = "<p><table align='center' style='widthoat:center; border:0px solid white;' cellpadding='10' > <tr style=' border:none'>";
+    // Only show step counter, no bar
+    var s = "<p style='font-size:22px; font-family:Optima; color:#000000; text-align:center'>Steps: " + (progress_step - 1) + "</p>";
 
-    healthbar = " <table align='center' style='width:absolute;widthoat:center'>";
-    bar = "";
-    
-    for (x = 0; x < maxsteps; x++) {
-        cl = "#00a055";
-        if (progress_step > 25) {
-          cl = "#f90000";
-        } else
-        if (progress_step > 22) {
-          cl = "#ff0000";
-        } else if (progress_step > 19) {
-          cl = "#ff5500";
-        } else if (progress_step > 16) {
-          cl = "#ff9a33";
-        } else if (progress_step > 13) {
-          cl = "#ffff00";
-        } else if (progress_step > 10) {
-          cl = "#d5ff33";
-        } else if (progress_step > 7) {
-          cl = "#a2fa32";
-        } else if (progress_step > 4) {
-          cl = "#00f030";
-        }
-
-      if (x < maxsteps-progress_step+1) {
-         bar = "<td bgcolor='" + cl + "' width=7px height=7px style='border:1px solid #D5D5D5'></td>" + bar;
-      } else {
-         bar = "<td bgcolor='#ffffff' width=7px height=7px style='border:1px solid #D5D5D5'></td>" + bar;
-      }
-    }
-
-    healthbar += bar + "</table> <br><br>";
-    var progress = "<p style='font-size:22px; font-family:Optima; color:#ff0000'>Steps: " +  parseInt(progress_step-1) + "</p>" + healthbar;
-
-    var s = bigtable + "<td style=' border:none'>" + progress + " <table align='center' style='width:absolute; widthoat:center'>";
+    s += "<table align='center' style='width:auto; border-collapse: collapse;'>";
 
     calculate_seen();
 
-
     for (y = 0; y < height; y++) {
-      s = s + "<tr>";
-      for (x = 0; x < width; x++) {
- 
-        var w = parseInt(warr[y][x]);
-        if ( x == ax && y== ay && wagent!=2) {
-               s = s + "<td width=" + cellsize + "px height=" + cellsize +
-                        "px><img src='webfile/agent.png' style='width:" + cellsize +
-                        "px;height:" + cellsize + "px;display: block;'>";
-        } else if ( x == ax && y== ay && wagent==2) {
-               s = s + "<td width=" + cellsize + "px height=" + cellsize +
-                        "px;>"
-                       // "px;height:" + cellsize + "px;display: block;'>";
-        }
-        else if (w == 3) {
-                s = s + "<td width=" + cellsize + "px height=" + cellsize + 
-                        "px><img src='webfile/brickwall.png' style='width:" + cellsize + 
-                        "px;height:" + cellsize + "px;display: block;'>";
+        s += "<tr>";
+        for (x = 0; x < width; x++) {
+            var w = parseInt(warr[y][x]);
+            if (x == ax && y == ay && wagent != 2) {
+                s += "<td width='" + cellsize + "px' height='" + cellsize + "px'>" +
+                     "<img src='webfile/agent.png' style='width:" + cellsize + "px;height:" + cellsize + "px;display: block;'>" +
+                     "</td>";
+            } else if (x == ax && y == ay && wagent == 2) {
+                s += "<td width='" + cellsize + "px' height='" + cellsize + "px;'></td>";
+            } else if (w == 3) {
+                s += "<td width='" + cellsize + "px' height='" + cellsize + "px'>" +
+                     "<img src='webfile/brickwall.png' style='width:" + cellsize + "px;height:" + cellsize + "px;display: block;'>" +
+                     "</td>";
+            } else if (((seen[y][x] == 0 && w == 2) || w == 5) && wagent != 2) {
+                s += "<td bgcolor='#3D3D3D' width='" + cellsize + "px' height='" + cellsize + "px;'></td>";
+            } else {
+                let bkc = "#ffffff";
+                let clickHandler = "";
 
-        } else if (  ((seen[y][x] == 0 && w ==2) ||  w==5) && wagent !=2)  {
-                s = s + "<td bgcolor='#3D3D3D' width=" + cellsize + "px height=" + cellsize + "px;";
-        } else {
-
-              bkc = "#ffffff";
-              sclick = "tableClickedVoid";
-
-              if ( wagent !=2 ) {
-                  if (seen[y][x] == 1) {
-
-                        if (x == ax-1 && y == ay) {
-                                sclick = "tableClickedXminus";
-                        } else if (x == ax+1 && y == ay) {
-                                sclick = "tableClickedXplus";
-                        } else if (y == ay-1 && x == ax) {
-                                sclick = "tableClickedYminus";
-                        } else if (y == ay+1 && x == ax) {
-                                sclick = "tableClickedYplus";
+                if (wagent != 2) {
+                    // Check if cell is adjacent to agent and visible
+                    if (seen[y][x] === 1) {
+                        // Check if this cell is adjacent to the agent
+                        if (x === ax - 1 && y === ay) {
+                            clickHandler = "moveAgent(-1, 0)";
+                        } else if (x === ax + 1 && y === ay) {
+                            clickHandler = "moveAgent(1, 0)";
+                        } else if (y === ay - 1 && x === ax) {
+                            clickHandler = "moveAgent(0, -1)";
+                        } else if (y === ay + 1 && x === ax) {
+                            clickHandler = "moveAgent(0, 1)";
                         }
- 
-                        bkc = "#ffffff";
-                        if(w == 2) bkc = "#ff0000";
-                  } else {
-                         bkc = "#3D3D3D";
-                  }
-             }
-             
-             if (w==2 && seen[y][x] == 1 && wagent !=2) {
-                  s = s + "<td bgcolor='#ff0000' width=" + cellsize + "px height=" + cellsize + "px onclick='"; 
-                  s = s + sclick + "();'>";
-               } else if (w==6) {
-                  s = s + "<td bgcolor='#ffffff' width=" + cellsize + "px height=" + cellsize + "px onclick='";
-                  s = s + sclick + "();'>";
-               } else {
-                  s = s + "<td bgcolor='";
-                  s = s + bkc;
-                  s = s + "' width=" + cellsize + "px height=" + cellsize + "px onclick='";
-                  s = s + sclick;
-                  s = s + "();'>";
-              }
-        } 
-        s = s + "</td>";
-      }
-      s = s + "</tr>";
+                        
+                        bkc = (w === 2) ? "#ff0000" : "#ffffff";
+                    } else {
+                        bkc = "#3D3D3D";  // Hidden
+                    }
+                }
+
+                // Add onclick handler only for adjacent cells
+                const onclickAttr = clickHandler ? `onclick="${clickHandler}"` : "";
+                s += `<td bgcolor='${bkc}' width='${cellsize}px' height='${cellsize}px' ${onclickAttr}></td>`;
+            }
+        }
+        s += "</tr>";
     }
 
-    s = s + "</table>";
-
-    s = s + "</td></table>";
-    // alert("generate table"); // when the alerts do not show up it is something like a missing bracket that prevents compiling
-    //if (wagent!=2 && progress_step < 29) s = s + "<p  align='center'> <button type=\"button\" disabled>Submit</button></p>";
-    return s ;
+    s += "</table>";
+    return s;
 }
 
 function loadEventHandler() {
@@ -695,7 +639,7 @@ function loadEventHandler() {
 }
 
 function computeCellSize() {
-    const marginSpace = 40; // buffer for UI, padding, progress bar
+    const marginSpace = 5; // buffer for UI, padding, progress bar
     const maxWidth = window.innerWidth * 0.98;
     const maxHeight = window.innerHeight * 0.80;
 
@@ -706,7 +650,7 @@ function computeCellSize() {
 
     // Apply constraints: min 5px, max 38px
     newSize = Math.max(5, Math.floor(newSize));        // minimum usability
-    newSize = Math.min(newSize-2, 38);                   // 🔴 maximum cell size = 38px
+    newSize = Math.min(newSize-1, 38);                   // 🔴 maximum cell size = 38px
 
     if (!isFinite(newSize)) newSize = 5;
 
@@ -724,58 +668,7 @@ function computeCellSize() {
     }
 }
 
-// Compute cell size so the entire maze fits within viewport without scrolling
-function computeCellSize_old() {
-  var vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
-  var vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
 
-  // Determine available space based on the actual maze container and progress block
-  var mazeEl = document.querySelector('#ex1_container .maze-container');
-  var progressEl = document.getElementById('progress_block');
-  var rectTop = 0;
-  var rectWidth = Math.floor(vw * 0.98);
-  var progressHeight = 0;
-  if (progressEl && typeof progressEl.getBoundingClientRect === 'function') {
-    var prect = progressEl.getBoundingClientRect();
-    progressHeight = Math.ceil(prect.height);
-  }
-  if (mazeEl && typeof mazeEl.getBoundingClientRect === 'function') {
-    var mrect = mazeEl.getBoundingClientRect();
-    rectTop = Math.max(0, mrect.top);
-    rectWidth = Math.floor(mrect.width);
-  }
-  var maxW = rectWidth;
-  var maxH = Math.floor(vh - rectTop - progressHeight - 1);
-  if (maxH < 50) maxH = Math.floor(vh * 0.70);
-
-  // Fit based on actual map dimensions, accounting for 1px grid lines
-  var gridW = 1; // border width applied to each td with border-collapse: collapse
-  var sizeX = Math.floor((maxW - gridW * (width + 1)) / width);
-  var sizeY = Math.floor((maxH - gridW * (height + 1)) / height);
-  var size = Math.min(sizeX, sizeY);
-    // On MacBook Air and similar devices, reserve a few extra pixels to avoid any rounding-related clipping
-    if ((/Macintosh|Mac OS X/).test(navigator.userAgent)) {
-      size = Math.max(5, size - 1);
-    }
-
-  // Apply maximum and minimum cell size constraints
-  var maxCellPx = 38; // cap to avoid oversizing
-  if (size > maxCellPx) size = maxCellPx;
-  if (!isFinite(size) || size <= 0) size = 5;
-
-  var currentSize = (typeof cellsize === 'string') ? (parseInt(cellsize, 10) || 5) : cellsize;
-  var newSize = Math.max(5, size);
-  if (newSize !== currentSize) {
-    cellsize = newSize;
-    if (valid == 1) {
-      document.getElementById("ex1_container").innerHTML = generate_table();
-      fitPasses += 1;
-      if (fitPasses < 2) {
-        setTimeout(computeCellSize, 0);
-      }
-    }
-  }
-}
 
 // Handle keyboard input
 function handleKeyPress(event) {
@@ -783,12 +676,7 @@ function handleKeyPress(event) {
   if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(event.code)) {
     event.preventDefault();
   }
-  
-  // Only process if we haven't reached max steps
-  if (progress_step >= maxsteps) {
-    return;
-  }
-  
+
   switch(event.code) {
     case 'ArrowUp':
     case 'KeyW':
@@ -821,90 +709,62 @@ function handleKeyPress(event) {
   }
 }
 
-function tableClickedVoid() {
+function moveAgent(dx, dy) {
+    const newX = ax + dx;
+    const newY = ay + dy;
 
+    // Check bounds and wall collision
+    if (newX >= 0 && newX < width && newY >= 0 && newY < height) {
+        const w = parseInt(warr[newY][newX]);
+        if (w !== 3) {  // Not a wall
+            ax = newX;
+            ay = newY;
+            tableClicked();  // Handles step update, rendering, and win detection
+        }
+    }
 }
-
-function tableClickedXminus() {
- if (progress_step < maxsteps) {
-   ax = ax-1;
-   tableClicked();
- }
-}
-
-function tableClickedXplus() {
- if (progress_step < maxsteps) {
-   ax = ax+1;
-   tableClicked();
- }
-}
-
-function tableClickedYminus() {
- if (progress_step < maxsteps) {
-   ay = ay-1;
-   tableClicked();
- }
-}
-
-function tableClickedYplus() {
- if (progress_step < maxsteps) {
-   ay = ay+1;
-   tableClicked();
- }
-}
-
 
 function tableClicked() {
-        progress_step = progress_step + 1;
-	jssteps = jssteps+1;
-        savedpath += "p(" + ax + "," + ay + ");";
+    progress_step = progress_step + 1;
+    jssteps = jssteps + 1;
+    savedpath += "p(" + ax + "," + ay + ");";
 
-        var newtime = timestamp();
-        var difference = newtime - oldtime;
-        oldtime = newtime;
-        savedtime = savedtime + difference + ";"; 
+    var newtime = timestamp();
+    var difference = newtime - oldtime;
+    oldtime = newtime;
+    savedtime = savedtime + difference + ";"; 
 
-        /*var now= new Date(), 
-        h= now.getHours(), 
-        m= now.getMinutes(), 
-        s= now.getSeconds();
-        ms = now.getMilliseconds();
+    document.getElementById("ex1_container").innerHTML = generate_table(w);
+    fitPasses = 0;
+    setTimeout(computeCellSize, 0);
 
-        times = "t(" + h + "," + m + "," + s + "," + ms + ");";
-        savedtime += times;  
-*/
-	var w = parseInt(warr[ay][ax]);
+    var w = parseInt(warr[ay][ax]);
 
-        document.getElementById("ex1_container").innerHTML = generate_table(w);
-        fitPasses = 0;
-        setTimeout(computeCellSize, 0);
-        // if reached goal state.
-	
-       snext = "thanks_solve.php";
+    if (w == 2) {
+        let snext = "thanks_solve.php";
+        if (mn < num_test + num_practice - 1) {
+            snext = 'test.php';
+        }
+        if (mn == num_practice - 1) {
+            snext = 'planning_quiz.php';
+        }
 
-        if (w == 2 ) {
-                
-            if (mn < num_test + num_practice - 1 ) {
-                            snext = 'test.php';
-            }
+        document.getElementById("ex1_container").innerHTML += "<p align='center'><form name='frm' action='" + snext + 
+                              "' method='post' onsubmit='submitForm()'>" + 
+                              "<input type='text' name='name' hidden>" +
+                              "<input type='text' name='steps' hidden>" +
+                              "<input type='text' name='mazeno' hidden>" +
+                              "<input type='text' name='UID' hidden>" +
+                              "<input type='text' name='showEndNext' hidden>" +
+                              "<input type='text' name='firsttrial' hidden>" +
+                              "<input type='text' name='path' hidden>" +
+                              "<input type='text' name='time' hidden>" +
+                              "<input type='text' name='mazeID' hidden>" +
+                              "</form></p>";
 
-            if (mn == num_practice-1) {
-                snext = 'planning_quiz.php';
-            }
-
-            document.getElementById("ex1_container").innerHTML += "<p align='center'><form name='frm' action='" + snext + 
-                                  "' method='post' onsubmit='submitForm()'>" + 
-                                  "<input type='text' name='name' hidden><input type='text' name='steps' hidden>" + 
-                                  "<input type=text' name='mazeno' hidden><input type='text' name='UID' hidden>" +      
-                                  "<input type=text' name='showEndNext' hidden><input type=text' name='firsttrial' hidden>" +
-                                  "<input type='text' name='path' hidden><input type='text' name='time' hidden><input type='text' name='mazeID' hidden>" +
-                                  "</form></p>";
-
-                        
-                        submitForm();
-                        document.forms["frm"].submit();  
-	} 
-        
+        submitForm();
+        document.forms["frm"].submit();
+    }
 }
 
 
@@ -925,4 +785,4 @@ function submitForm() {
 </div>
 
 </body>
-</html> 
+</html>
